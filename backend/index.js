@@ -15,7 +15,8 @@ database.on('error', (error) => {
 })
 
 database.once('connected', () => {
-    console.log('Database Connected');
+    console.log('Database Connected'); 
+    
 })
 
 // initilize server
