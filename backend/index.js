@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('./models/user');
+const cors = require('cors');
 
 // databse connection
 const mongoString = "mongodb+srv://basmilbhan:Everest8848@cluster0.6tcvr68.mongodb.net/?retryWrites=true&w=majority";
@@ -21,7 +22,7 @@ database.once('connected', () => {
 
 // initilize server
 const app = express();
-
+app.use(cors({origin:'http://localhost:3000'}))
 app.use(express.json());
 
 // server end-point/api
