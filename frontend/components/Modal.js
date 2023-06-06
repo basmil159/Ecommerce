@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import UserSignup from './UserSignup';
 import UserSignin from './UserSignin';
 
-const Modal = ({ isOpen, onClose }) => {
+const Modal = ({ isOpen, onClose, onSignin, setLoggedIn, setIsModalOpen }) => {
   if (!isOpen) {
     return null;
   }
@@ -43,7 +43,11 @@ const Modal = ({ isOpen, onClose }) => {
             Login
           </button>
         </div>
-        {isSignup ? <UserSignup /> : <UserSignin />}
+        {
+
+        isSignup ? <UserSignup /> : <UserSignin onSignin={onSignin} setLoggedIn={setLoggedIn} setIsModalOpen={setIsModalOpen}/>
+        
+        }
       </div>
     </div>
   );

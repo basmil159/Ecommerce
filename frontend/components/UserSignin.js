@@ -5,11 +5,12 @@ import { Form, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
 import { useRouter } from 'next/router';
+import { ToastContainer, toast } from 'react-toastify';
 
 const instance = axios.create({
   baseURL: 'http://localhost:8000/',
   timeout: 1000,
-  headers: {'Access-Control-Allow-Origin': '*'}
+  headers: { 'Access-Control-Allow-Origin': '*', Accept: '*/*' },
 });
 
 const loginValidationSchema = Yup.object().shape({
@@ -19,22 +20,35 @@ const loginValidationSchema = Yup.object().shape({
     .required('Password is required'),
 });
 
-const UserSignin = ({ onSignin }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const router =useRouter();
+const UserSignin = ({ onSignin, setLoggedIn,setIsModalOpen }) => {
+  const router = useRouter();
   const formOptions = { resolver: yupResolver(loginValidationSchema) };
-  const { register, handleSubmit, formState, reset } = useForm(formOptions);
+  const { register, handleSubmit, formState, errors } = useForm(formOptions);
 
   const handleSignin = (data) => {
     instance
-      .post('sign-in', {...data})
+      .post('sign-in', { ...data })
       .then((response) => {
-        // console.log(response);
-        router.reload();
+        if (response.status === 200) {
+          toast.success('Login Sucessful', {
+            position: 'top-center',
+            theme: 'light',
+          });
+          setLoggedIn(false);
+          setIsModalOpen(false);
+        }
+
+        // onSignin();
+        // router.reload();
       })
       .catch((e) => {
-        console.log(e);
+        if (e.response?.status === 401) {
+          toast.success(e.response.data.message, {
+            position: 'top-center',
+            theme: 'light',
+          });
+          setLoggedIn(true);
+        }
       });
   };
 
