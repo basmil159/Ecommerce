@@ -1,6 +1,26 @@
 const mongoose = require('mongoose');
-const {isEmail} = require('validator');
+const { isEmail } = require('validator');
 const userSchema = mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'Name is required'],
+    validate: {
+      validator: (value) => {
+        return value.length > 1;
+      },
+      message: (props) => `${props.value} is not a valid name`,
+    }
+  },
+  username: {
+    type: String,
+    required: [true, 'User Name is required'],
+    validate: {
+      validator: (value) => {
+        return value.length >= 5;
+      },
+      message: () => 'Username must be at least six characters long',
+    }
+  },
   email: {
     type: String,
     required: [true, 'Email is required'],
