@@ -5,6 +5,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
+import { useRouter } from 'next/router';
+
 
 const instance = axios.create({
   baseURL: 'http://localhost:8000/',
@@ -61,6 +63,8 @@ const ProductListingPage = () => {
         .then(response => {
           setProducts([...products, response.data]);
           toast.success('Product added successfully');
+    reset();
+
         })
         .catch(error => {
           toast.error('Failed to add product');
@@ -68,6 +72,9 @@ const ProductListingPage = () => {
         });
     }
     reset();
+    window.location.reload(); // Reload the page
+
+
     setEditingProduct(null);
   };
 
@@ -93,11 +100,9 @@ const ProductListingPage = () => {
     setSearchTerm(e.target.value);
   };
 
-
   const filteredProducts = products.filter((product) =>
-  product.name && product.name.toLowerCase().includes(searchTerm.toLowerCase())
-);
-
+    product.name && product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="product-listing-page">
