@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const productRoutes = require('./routes/products');
 const userRoutes = require('./routes/users');
+const orderRoutes = require('./routes/order');
 
 // databse connection
 const mongoString =
@@ -27,6 +28,7 @@ app.use(express.json());
 //Routes
 app.use(userRoutes);
 app.use(productRoutes);
+app.use(orderRoutes);
 
 app.listen(8000, () => {
   console.log(`Server Started at ${8000}`);

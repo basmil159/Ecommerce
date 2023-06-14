@@ -30,12 +30,14 @@ const UserSignin = ({ onSignin, setLoggedIn,setIsModalOpen }) => {
       .post('sign-in', { ...data })
       .then((response) => {
         if (response.status === 200) {
+          console.log(response.data);
+          setLoggedIn(false);
+          setIsModalOpen(false);
+          localStorage.setItem("token",response.data.token);
           toast.success('Login Sucessful', {
             position: 'top-center',
             theme: 'light',
           });
-          setLoggedIn(false);
-          setIsModalOpen(false);
         }
 
         // onSignin();

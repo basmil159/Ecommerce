@@ -1,14 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import axios from 'axios';
+
 import ProductList from '../components/ProductList';
 import ProductSearch from '../components/ProductSearch';
 import ProductFilter from '../components/ProductFilter';
-import UserSignup from '../components/UserSignup';
-import UserSignin from '../components/UserSignin';
 import Modal from '../components/Modal';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useRouter } from 'next/router';
+import { CartContext } from '../context/CartContext';
+import Link from 'next/link';
+
+
+const instance = axios.create({
+  baseURL: 'http://localhost:8000/',
+  timeout: 1000,
+  headers: { 'Access-Control-Allow-Origin': '*' },
+});
 
 const HomePage = () => {
+  const router = useRouter();
   const [loggedIn, setLoggedIn] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
@@ -17,37 +28,15 @@ const HomePage = () => {
   const [signupData, setSignupData] = useState(null);
   const [signinData, setSigninData] = useState(null);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [user, setUser] = useState();
 
-  useEffect(() => {
-    // Fetch products from backend API and set the products state variable
-    const fetchProducts = async () => {
-      // Replace this with your API call to fetch the products
-      const response = await fetch('/api/products');
-      const data = await response.json();
-      setProducts(data);
-    };
+  const { addToCart } = useContext(CartContext);
+  const { cartItems } = useContext(CartContext);
 
-    fetchProducts();
-  }, []);
-
-  useEffect(() => {
-    console.log(loggedIn);
-    console.log(isModalOpen);
-  }, [loggedIn, isModalOpen]);
-
-  useEffect(() => {
-    // Apply filtering when the filterCategory or products change
-    const filtered = products.filter((product) => {
-      if (filterCategory === '') {
-        return true;
-      } else {
-        return product.category === filterCategory;
-      }
-    });
-
-    setFilteredProducts(filtered);
-  }, [filterCategory, products]);
-
+  useEffect(()=>{
+    console.log(cartItems);
+  },[loggedIn]);
+  
   const handleSearch = (term) => {
     setSearchTerm(term);
   };
@@ -71,6 +60,62 @@ const HomePage = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+  useEffect(() => {
+    const fetchProducts = () => {
+      instance
+        .get('products')
+        .then((response) => {
+          setProducts([...response.data]);
+        })
+        .catch((error) => {
+          toast.error('Failed to fetch products');
+          console.error('Failed to fetch products:', error);
+        });
+    };
+
+    fetchProducts();
+  }, []);
+  const getToken = () =>{
+    return localStorage.getItem('token');
+  }
+  useEffect(() => {
+    const token = getToken();
+
+    if (token) {
+      instance
+        .get('verify', {
+          headers: {
+            Authorization: token,
+          },
+        })
+        .then((response) => {
+          setUser(response.data);
+          setLoggedIn(false);
+          setIsModalOpen(false);
+        })
+        .catch((error)=>{
+          setIsModalOpen(true);
+          setLoggedIn(true);
+          router.push('/');
+        })
+    }
+  }, []);
+
+
+
+  useEffect(() => {
+    // Apply filtering when the filterCategory or products change
+    const filtered = products.filter((product) => {
+      if (filterCategory === '') {
+        return true;
+      } else {
+        return product.category === filterCategory;
+      }
+    });
+
+    setFilteredProducts(filtered);
+  }, [filterCategory, products]);
 
   return (
     <div className='flex flex-col min-h-screen'>
@@ -103,10 +148,9 @@ const HomePage = () => {
             )}
             {loggedIn == false && (
               <button className='bg-gray-200 rounded p-2' onClick={openModal}>
-                signout
+                Account
               </button>
             )}
-            {/* User Account Icon */}
           </div>
         </div>
       </header>
@@ -114,7 +158,9 @@ const HomePage = () => {
       <Modal
         setIsModalOpen={setIsModalOpen}
         isOpen={isModalOpen}
+        user={user}
         onClose={closeModal}
+
         setLoggedIn={setLoggedIn}
         onSignin={handleSignin}
       ></Modal>
@@ -129,6 +175,7 @@ const HomePage = () => {
             products={filteredProducts}
             searchTerm={searchTerm}
             signupData={signupData}
+            onAddToCart={addToCart}
             signinData={signinData}
           />
         </div>
@@ -147,13 +194,13 @@ const HomePage = () => {
               <h2 className='text-lg font-bold mb-2'>Quick Links</h2>
               <ul className='text-sm'>
                 <li>
-                  <a href='/'>Home</a>
+                  <Link href='/'>Home</Link>
                 </li>
                 <li>
-                  <a href='/products'>Products</a>
+                  <Link href='/products'>Products</Link>
                 </li>
                 <li>
-                  <a href='/contact'>Contact Us</a>
+                  <Link href='/contact'>Contact Us</Link>
                 </li>
               </ul>
             </div>

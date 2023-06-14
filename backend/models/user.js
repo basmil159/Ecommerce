@@ -39,5 +39,9 @@ const userSchema = mongoose.Schema({
       message: () => 'Password must be at least six characters long',
     },
   },
+  is_admin:{
+    type: Boolean,
+    default:false,
+  },
 });
 module.exports = mongoose.model('User', userSchema);
