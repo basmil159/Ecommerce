@@ -26,6 +26,7 @@ const Modal = ({
       onClose();
     }
   };
+  console.log(user.user.name);
 
   return (
     <div
@@ -33,9 +34,10 @@ const Modal = ({
       onClick={handleOutsideClick}
     >
       <div className='bg-white p-4 rounded shadow'>
+        
         {user ? (
-          <div className='flex flex-col gap-8'>
-            <Link href="/cart">CART</Link>
+          <div className='flex flex-col gap-8 text-black'>
+            <Link href='/cart'>CART</Link>
             <button>SIGNOUT</button>
           </div>
         ) : (
