@@ -4,8 +4,7 @@ const Product = require('../models/product');
 
 // Create a new product
 router.post('/products', async (req, res) => {
-    
-    try {
+     try {
         console.log(req.body);
       const { name, price, image, description } = req.body;
     const newProduct = new Product({
